@@ -8,7 +8,7 @@ public class MonitorService : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await AddJobHangfire();
+        await AddJobs();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -16,20 +16,22 @@ public class MonitorService : IHostedService
         return Task.CompletedTask;
     }
 
-    private static async Task AddJobHangfire()
+    private static async Task AddJobs()
     {
-        //Scheduled Jobs
+        // Scheduled Jobs: These are jobs that will be executed once after a specified delay.
         BackgroundJob.Schedule(() => Print("This is a scheduled job", null), TimeSpan.FromSeconds(5));
 
-        //Enqueued Jobs
-        var jobId = BackgroundJob.Enqueue("QueueName", () => Print("This is a Enqueued job", null));
+        // Enqueued Jobs: These are jobs that are added to a queue and will be executed when resources are available.
+        // Queue names must be lower case.
+        var jobId = BackgroundJob.Enqueue("queue-name", () => Print("This is an enqueued job", null));
 
-        //Continue Job
-        BackgroundJob.ContinueJobWith(jobId, () => Print($"Continue job runned after Job with Job Id: {jobId}", null));
+        // Continue Job: This is a job that will be executed after another job completes.
+        BackgroundJob.ContinueJobWith(jobId, () => Print($"Continue job executed after job with Job Id: {jobId}", null));
 
-        //Recurring Job
-        RecurringJob.AddOrUpdate("Recurring Job", () => Print("This is a recurring job", null), cronExpression: MinuteInterval(1));
+        // Recurring Job: These are jobs that are executed repeatedly based on a cron expression or time interval.
+        RecurringJob.AddOrUpdate("Recurring Job", () => Print("This is a recurring job", null), cronExpression: Cron.MinuteInterval(1));
     }
+
 
     //can this be private?
     private static void Print(string message, PerformContext? context) => context.WriteLine(message);
