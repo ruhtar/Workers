@@ -33,8 +33,8 @@ public class MonitorService : IHostedService
     }
 
 
-    //can this be private?
-    private static void Print(string message, PerformContext? context) => context.WriteLine(message);
+    //Only public methods can be invoked in the background
+    public static void Print(string message, PerformContext? context) => context.WriteLine(message);
 
     public static string MinuteInterval(int interval) => $"*/{interval} * * * *";
 }
