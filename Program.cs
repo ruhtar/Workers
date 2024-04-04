@@ -2,8 +2,11 @@ using Hangfire;
 using Hangfire.Console;
 using Hangfire.Redis.StackExchange;
 using StackExchange.Redis;
+using Worker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHostedService<MonitorService>();
 
 builder.Services.AddHangfire(options =>
 {
